@@ -10,6 +10,7 @@ packages = [{include = "app"}]
 python = "^3.10"
 sqlalchemy = "^2.0.18"
 fastapi = {version = "^0.99", extras = ["all"]}
+asgi-correlation-id = "^4.2.0"
 
 
 [build-system]
