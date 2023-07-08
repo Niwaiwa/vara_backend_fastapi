@@ -8,10 +8,8 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.100.0"
 sqlalchemy = "^2.0.18"
-uvicorn = {extras = ["standard"], version = "^0.22.0"}
-pydantic-settings = "^2.0.1"
+fastapi = {version = "^0.99", extras = ["all"]}
 
 
 [build-system]
