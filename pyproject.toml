@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "vara-beckend-fastapi"
+name = "vara-backend-fastapi"
 version = "0.1.0"
 description = ""
 authors = ["Niwaiwa <po2846@gmail.com>"]
