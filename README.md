@@ -19,3 +19,9 @@ PYTHONPATH=./ alembic.exe upgrade +2
 PYTHONPATH=./ alembic.exe downgrade base
 PYTHONPATH=./ alembic.exe downgrade -1
 ```
+
+## initail data
+
+```bash
+python /app/app/initial_data.py
+```

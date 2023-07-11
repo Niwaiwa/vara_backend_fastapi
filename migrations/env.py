@@ -17,7 +17,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.model.base_model import Base
+from app.db.base import Base
 
 target_metadata = Base.metadata
 
@@ -27,6 +27,11 @@ target_metadata = Base.metadata
 # ... etc.
 
 def get_url():
+    from pathlib import Path
+    from dotenv import load_dotenv
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    env_path = BASE_DIR / '.env'
+    load_dotenv(dotenv_path=env_path)
     db_url = os.getenv("DB_URL")
     return db_url
 
