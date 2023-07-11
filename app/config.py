@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     db_url: str = "postgresql://postgres:password@localhost:5432/vara"
 
     class Config:
-        env_file = ".env"
+        env_file = "../.env"
 
 @lru_cache()
 def get_settings() -> Settings:
