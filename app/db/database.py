@@ -7,7 +7,7 @@ env = get_settings()
 
 # Create Database Engine
 Engine = create_engine(
-    env.db_url, echo=env.debug, future=True
+    env.DB_URL, echo=env.DEBUG, future=True
 )
 
 SessionLocal = sessionmaker(

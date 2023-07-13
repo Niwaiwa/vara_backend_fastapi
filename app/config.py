@@ -7,9 +7,10 @@ from logging.config import dictConfig
 logger = logging.getLogger('app')
 
 class Settings(BaseSettings):
-    secret_key: str = "secret"
-    debug: bool = False
-    db_url: str = "postgresql://postgres:password@localhost:5432/vara"
+    SECRET_KEY: str = "secret"
+    DEBUG: bool = False
+    DB_URL: str = "postgresql://postgres:password@localhost:5432/vara"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     class Config:
         env_file = "../.env"

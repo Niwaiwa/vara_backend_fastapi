@@ -13,6 +13,8 @@ fastapi = {version = "^0.99", extras = ["all"]}
 asgi-correlation-id = "^4.2.0"
 alembic = "^1.11.1"
 psycopg2 = "^2.9.6"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 
 [build-system]

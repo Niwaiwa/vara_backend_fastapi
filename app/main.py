@@ -19,5 +19,5 @@ def read_root():
 async def info(settings: Annotated[config.Settings, Depends(get_settings)]):
     logger.info("info")
     return {
-        "debug": settings.debug,
+        "debug": settings.DEBUG,
     }
