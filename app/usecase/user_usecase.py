@@ -9,25 +9,30 @@ class UserUseCase:
     def __init__(self, userRepository: UserRepository = Depends()) -> None:
         self.userRepository = userRepository
 
-    def create(self, db, user):
+    def create(self, user):
         hashed_password = get_password_hash(user.password)
-        return self.userRepository.create(db, user, hashed_password)
+        return self.userRepository.create(user, hashed_password)
     
-    def get_by_username(self, db, username):
-        return self.userRepository.get_by_username(db, username)
+    def get_by_username(self, username):
+        return self.userRepository.get_by_username(username)
     
-    def get_by_email(self, db, email):
-        return self.userRepository.get_by_email(db, email)
+    def get_by_email(self, email):
+        return self.userRepository.get_by_email(email)
     
-    def get(self, db, id):
-        return self.userRepository.get(db, id)
+    def get(self, id):
+        return self.userRepository.get(id)
     
-    def get_multi(self, db, skip: int = 0, limit: int = 100):
-        return self.userRepository.get_multi(db, skip, limit)
+    def get_multi(self, skip: int = 0, limit: int = 100):
+        return self.userRepository.get_multi(skip, limit)
     
-    def update(self, db, id, user):
-        db_user = self.userRepository.get(db, id)
-        return self.userRepository.update(db, db_user, user)
+    def update(self, id, user):
+        db_user = self.userRepository.get(id)
+        return self.userRepository.update(db_user, user)
     
-    def delete(self, db, id):
-        return self.userRepository.delete(db, id)
+    def update_password(self, id, password):
+        db_user = self.userRepository.get(id)
+        hashed_password = get_password_hash(password)
+        return self.userRepository.update(db_user, {'password': hashed_password})
+    
+    def delete(self, id):
+        return self.userRepository.delete(id)
