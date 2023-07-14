@@ -2,12 +2,16 @@ from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
 
-from app.core.security import get_password_hash
 from app.models.user_model import User
 from app.repositories.base_repository import BaseRepository
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user_schema import UserCreate, UserUpdate
+
 
 class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
+
+    def __init__(self, db: Session):
+        super().__init__(User, db)
+
     def get_by_username(self, username: str) -> Optional[User]:
         return self.db.query(User).filter(User.username == username).first()
 
@@ -46,19 +50,3 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         self.db.delete(obj)
         self.db.commit()
         return obj
-
-    # def authenticate(self, db: Session, *, email: str, password: str) -> Optional[User]:
-    #     user = self.get_by_email(db, email=email)
-    #     if not user:
-    #         return None
-    #     if not verify_password(password, user.hashed_password):
-    #         return None
-    #     return user
-
-    # def is_active(self, user: User) -> bool:
-    #     return user.is_active
-
-    # def is_superuser(self, user: User) -> bool:
-    #     return user.is_superuser
-    
-user = UserRepository(User)

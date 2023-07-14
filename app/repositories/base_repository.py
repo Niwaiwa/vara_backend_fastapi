@@ -1,12 +1,10 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
-from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db.base import Base
-from app.db.database import get_db_connection
 
 # force to use specific type
 ModelType = TypeVar("ModelType", bound=Base)
@@ -15,7 +13,7 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType], db: Session = Depends(get_db_connection)):
+    def __init__(self, model: Type[ModelType], db: Session):
         self.model = model
         self.db = db
 

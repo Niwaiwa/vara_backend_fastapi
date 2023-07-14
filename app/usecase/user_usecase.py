@@ -1,12 +1,9 @@
-from fastapi import Depends
 from app.core.security import get_password_hash
 from app.repositories.user_repository import UserRepository
 
 
 class UserUseCase:
-    userRepository: UserRepository
-
-    def __init__(self, userRepository: UserRepository = Depends()) -> None:
+    def __init__(self, userRepository: UserRepository) -> None:
         self.userRepository = userRepository
 
     def create(self, user):
@@ -36,3 +33,17 @@ class UserUseCase:
     
     def delete(self, id):
         return self.userRepository.delete(id)
+    
+    def authenticate(self, username: str, password: str):
+        user = self.userRepository.get_by_username(username)
+        if not user:
+            return None
+        if not get_password_hash(password) == user.password:
+            return None
+        return user
+    
+    def is_active(self, user):
+        return user.is_active
+    
+    def is_superuser(self, user):
+        return user.is_superuser
