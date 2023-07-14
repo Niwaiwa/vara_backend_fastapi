@@ -1,9 +1,10 @@
 import uuid
 from sqlalchemy.orm import Session
 
-from app import repositories, schemas
+from app import schemas
 from app.models.user_model import User
 from app.core.security import get_password_hash
+from app.repositories.user_repository import UserRepository
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
@@ -19,7 +20,7 @@ def init_db(db: Session) -> None:
     email = 'admin@gmail.com'
     hashed_password = get_password_hash('admin')
 
-    user = repositories.UserRepository(User).get_by_username(db, username='admin')
+    user = UserRepository(db).get_by_username(username='admin')
     if not user:
         user_in = schemas.UserCreate(
             username=username,
@@ -27,4 +28,4 @@ def init_db(db: Session) -> None:
             password=hashed_password,
             is_superuser=True,
         )
-        user = repositories.UserRepository(User).create(db, user_in, hashed_password)  # noqa: F841
+        user = UserRepository(db).create(user_in, hashed_password)  # noqa: F841
