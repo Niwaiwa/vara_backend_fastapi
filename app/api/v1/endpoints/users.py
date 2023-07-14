@@ -24,7 +24,7 @@ def read_user_by_id(
     """
     user_usecase = UserUseCase(UserRepository(db))
     user = user_usecase.get(user_id)
-    logger.info(f"User: {user.__dict__}")
+    logger.info(f"User: {user}")
     # if not user or user.is_staff or user.is_superuser:
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

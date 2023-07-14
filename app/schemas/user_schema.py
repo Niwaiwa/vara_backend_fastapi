@@ -49,3 +49,24 @@ class User(UserInDBBase):
 
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+
+class RegisterUser(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+
+
+class RegisterUserResponse(BaseModel):
+    access_token: str
+    user_info: User
+
+
+class LoginUser(BaseModel):
+    username: str
+    password: str
+
+
+class LoginUserResponse(BaseModel):
+    access_token: str
+    user_info: User

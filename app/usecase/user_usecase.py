@@ -1,8 +1,10 @@
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
 from app.repositories.user_repository import UserRepository
 
 
 class UserUseCase:
+    userRepository: UserRepository
+
     def __init__(self, userRepository: UserRepository) -> None:
         self.userRepository = userRepository
 
@@ -38,7 +40,7 @@ class UserUseCase:
         user = self.userRepository.get_by_username(username)
         if not user:
             return None
-        if not get_password_hash(password) == user.password:
+        if not verify_password(password, user.password):
             return None
         return user
     
