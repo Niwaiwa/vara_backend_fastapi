@@ -14,7 +14,12 @@ logger = logging.getLogger('app')
 
 app = FastAPI(on_startup=[config.configure_logging], openapi_url="/api/openapi.json")
 app.add_middleware(CorrelationIdMiddleware)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=['X-Requested-With', 'X-Request-ID'],
+    expose_headers=['X-Request-ID'])
 app.include_router(api_router, prefix="/api")
 
 @app.get("/")
