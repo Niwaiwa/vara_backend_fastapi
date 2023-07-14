@@ -55,6 +55,7 @@ LOGGIN_CONFIG = {
         # 'databases': {'handlers': ['console'], 'level': 'WARNING'},
         # 'httpx': {'handlers': ['console'], 'level': 'INFO'},
         'asgi_correlation_id': {'handlers': ['console'], 'level': 'WARNING'},
+        'sqlalchemy': {'handlers': ['console'], 'level': 'WARNING'},
     },
 }
 
