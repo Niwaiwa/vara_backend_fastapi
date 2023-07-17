@@ -59,7 +59,7 @@ class RegisterUser(BaseModel):
 
 class RegisterUserResponse(BaseModel):
     access_token: str
-    user_info: User
+    token_type: str
 
 
 class LoginUser(BaseModel):
@@ -69,4 +69,4 @@ class LoginUser(BaseModel):
 
 class LoginUserResponse(BaseModel):
     access_token: str
-    user_info: User
+    token_type: str

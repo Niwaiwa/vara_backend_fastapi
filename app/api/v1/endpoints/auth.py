@@ -43,7 +43,7 @@ def login_access_token(
         "access_token": create_access_token(
             user.id, expires_delta=access_token_expires
         ),
-        "user_info": user,
+        "token_type": "bearer",
     }
 
 @router.post("/register", response_model=schemas.RegisterUserResponse)
@@ -73,7 +73,7 @@ def register_user(
         "access_token": create_access_token(
             user.id, expires_delta=access_token_expires
         ),
-        "user_info": user,
+        "token_type": "bearer",
     }
 
 
