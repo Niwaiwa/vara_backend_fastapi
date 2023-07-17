@@ -53,8 +53,8 @@ class UserInDB(UserInDBBase):
 
 class RegisterUser(BaseModel):
     username: str
-    password: str
     email: EmailStr
+    password: str
 
 
 class RegisterUserResponse(BaseModel):

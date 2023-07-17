@@ -1,8 +1,9 @@
 import logging
 from datetime import timedelta
-from typing import Any
+from typing import Any, Annotated
+from pydantic import EmailStr
 
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -48,17 +49,22 @@ def login_access_token(
 
 @router.post("/register", response_model=schemas.RegisterUserResponse)
 def register_user(
-    form_data: schemas.RegisterUser = Depends(),
+    username: Annotated[str, Form()],
+    email: Annotated[EmailStr, Form()],
+    password: Annotated[str, Form()],
     db: Session = Depends(get_db_connection),
 ) -> Any:
     """
     Register new user.
     """
+    form_data = schemas.RegisterUser(username=username, email=email, password=password)
+    logger.info(f"username: {username}, email: {email}")
+
     user_usecase = UserUseCase(UserRepository(db))
     user = user_usecase.get_by_username(form_data.username)
     if user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    user = user_usecase.get_by_email(form_data.username)
+    user = user_usecase.get_by_email(form_data.email)
     if user:
         raise HTTPException(status_code=400, detail="Email already registered")
     user = user_usecase.create(
