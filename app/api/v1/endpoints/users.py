@@ -25,3 +25,17 @@ def read_user_by_id(
     """
     return current_user
 
+
+@router.put("/{user_id}", response_model=schemas.User)
+def update_user(
+    user_id: uuid.UUID,
+    user: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db_connection),
+) -> Any:
+    """
+    Update a user.
+    """
+    user_usecase = UserUseCase(UserRepository(db))
+    return user_usecase.update(current_user.id, user)
+

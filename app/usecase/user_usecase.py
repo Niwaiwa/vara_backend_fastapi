@@ -26,6 +26,10 @@ class UserUseCase:
     
     def update(self, id, user):
         db_user = self.userRepository.get(id)
+        if user.password:
+            hashed_password = get_password_hash(user.password)
+            user.password = hashed_password
+        user = user.dict(exclude_unset=True)
         return self.userRepository.update(db_user, user)
     
     def update_password(self, id, password):

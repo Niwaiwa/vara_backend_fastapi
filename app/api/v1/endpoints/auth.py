@@ -30,13 +30,13 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    logger.info(f"form_data: {form_data.__dict__}")
+    logger.info(f"username: {form_data.username}")
     user_usecase = UserUseCase(UserRepository(db))
     user = user_usecase.authenticate(
         form_data.username, form_data.password
     )
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
     # elif not user_usecase.is_active(user):
     #     raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=env.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -89,3 +89,11 @@ def test_token(current_user: models.User = Depends(get_current_user)) -> Any:
     Test access token
     """
     return current_user
+
+
+@router.get("/logout")
+def logout() -> Any:
+    """
+    Logout
+    """
+    return {"message": "Logout"}

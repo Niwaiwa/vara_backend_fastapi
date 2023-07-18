@@ -20,15 +20,17 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserUpdatePassword(UserBase):
+class UserUpdatePassword(BaseModel):
     password: Optional[str] = None
 
 
-class UserUpdate(UserBase):
+class UserUpdate(UserUpdatePassword):
+    email: Optional[EmailStr] = None
     nickname: Optional[str] = None
     avatar: Optional[str] = None
     header: Optional[str] = None
     description: Optional[str] = None
+    locale: Optional[str] = None
 
 
 class UserInDBBase(UserBase):
