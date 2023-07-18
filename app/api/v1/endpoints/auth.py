@@ -7,10 +7,9 @@ from fastapi import Depends, HTTPException, APIRouter, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app import models, schemas
+from app import models, schemas, config
 from app.core.security import create_access_token
 from app.core.deps import get_current_user
-from app.core.security import get_password_hash
 from app.config import get_settings
 from app.usecase.user_usecase import UserUseCase
 from app.repositories.user_repository import UserRepository
@@ -18,7 +17,6 @@ from app.db.database import get_db_connection
 
 
 logger = logging.getLogger(__name__)
-env = get_settings()
 router = APIRouter()
 
 
@@ -26,6 +24,7 @@ router = APIRouter()
 def login_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db_connection),
+    settings: config.Settings = Depends(get_settings),
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -39,7 +38,7 @@ def login_access_token(
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     # elif not user_usecase.is_active(user):
     #     raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=env.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
             user.id, expires_delta=access_token_expires
@@ -53,6 +52,7 @@ def register_user(
     email: Annotated[EmailStr, Form()],
     password: Annotated[str, Form()],
     db: Session = Depends(get_db_connection),
+    settings: config.Settings = Depends(get_settings),
 ) -> Any:
     """
     Register new user.
@@ -74,7 +74,7 @@ def register_user(
             password=form_data.password,
         )
     )
-    access_token_expires = timedelta(minutes=env.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
             user.id, expires_delta=access_token_expires
