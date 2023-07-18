@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     DB_URL: str = "postgresql://postgres:password@localhost:5432/vara"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    UPLOAD_IMAGE_TYPE: list = ["image/jpeg", "image/png", "image/gif"]
+    UPLOAD_IMAGE_SIZE_LIMIT: int = 2 * 1024 * 1024
+    UPLOAD_IMAGE_PATH: str = "media/images"
+    UPLOAD_IMAGE_URL: str = "/media/images"
 
     class Config:
         env_file = "../.env"
