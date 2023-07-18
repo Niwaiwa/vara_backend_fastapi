@@ -2,6 +2,7 @@ import logging
 
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import Annotated
 
@@ -13,6 +14,8 @@ from app.api.v1.router import api_router
 logger = logging.getLogger('app')
 
 app = FastAPI(on_startup=[config.configure_logging], openapi_url="/api/openapi.json")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/media", StaticFiles(directory="media"), name="media")
 app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +24,7 @@ app.add_middleware(
     allow_headers=['X-Requested-With', 'X-Request-ID', 'Content-Type', 'Accept', 'Authorization'],
     expose_headers=['X-Request-ID'])
 app.include_router(api_router, prefix="/api")
+
 
 @app.get("/")
 def read_root():
