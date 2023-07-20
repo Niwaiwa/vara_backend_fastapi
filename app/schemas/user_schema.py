@@ -72,3 +72,13 @@ class LoginUser(BaseModel):
 class LoginUserResponse(BaseModel):
     access_token: str
     token_type: str
+
+
+class ProfileResponse(BaseModel):
+    id: Optional[uuid.UUID] = None
+    username: Optional[str] = None
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+    header: Optional[str] = None
+    description: Optional[str] = None
+    
