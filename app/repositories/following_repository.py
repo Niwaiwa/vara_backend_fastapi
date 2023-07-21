@@ -58,8 +58,8 @@ class FollowingRepository(BaseRepository[Following, FollowingCreate, FollowingUp
     def get_follower_list_by_user_id(self, user_id: uuid.UUID) -> list:
         return self.db.query(Following).filter(Following.following_user_id == user_id).all()
 
-    def get_following_list_by_user_id_and_offset_and_limit(self, user_id: uuid.UUID, offset: int, limit: int) -> list:
+    def get_following_list_by_user_id_and_offset_and_limit(self, user_id: uuid.UUID, offset: int = 0, limit: int = 100) -> list:
         return self.db.query(Following).filter(Following.user_id == user_id).offset(offset).limit(limit).all()
     
-    def get_follower_list_by_user_id_and_offset_and_limit(self, user_id: uuid.UUID, offset: int, limit: int) -> list:
+    def get_follower_list_by_user_id_and_offset_and_limit(self, user_id: uuid.UUID, offset: int = 0, limit: int = 100) -> list:
         return self.db.query(Following).filter(Following.following_user_id == user_id).offset(offset).limit(limit).all()
