@@ -23,5 +23,5 @@ PYTHONPATH=./ alembic.exe downgrade -1
 ## initail data
 
 ```bash
-python /app/app/initial_data.py
+python initial_data.py
 ```
