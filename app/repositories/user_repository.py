@@ -1,3 +1,4 @@
+import uuid
 from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
@@ -45,7 +46,7 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
             update_data = obj_in.dict(exclude_unset=True)
         return super().update(db_obj=db_obj, obj_in=update_data)
     
-    def delete(self, id: int) -> User:
+    def delete(self, id: uuid.UUID) -> User:
         obj = self.db.query(User).get(id)
         self.db.delete(obj)
         self.db.commit()
