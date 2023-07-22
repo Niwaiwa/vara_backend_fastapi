@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 
 class FollowingBase(BaseModel):
     user_id: uuid.UUID
-    following_id: uuid.UUID
+    following_user_id: uuid.UUID
 
 
 class FollowingCreate(FollowingBase):
@@ -15,6 +15,10 @@ class FollowingCreate(FollowingBase):
 
 class FollowingUpdate(FollowingBase):
     pass
+
+
+class FollowingUserID(BaseModel):
+    following_user_id: uuid.UUID
 
 
 class FollowingInDBBase(FollowingBase):

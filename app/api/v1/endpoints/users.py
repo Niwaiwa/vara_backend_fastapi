@@ -19,9 +19,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/", response_model=schemas.User)
 def read_user_by_id(
-    user_id: uuid.UUID,
     current_user: models.User = Depends(get_current_user)
 ) -> Any:
     """
@@ -30,9 +29,8 @@ def read_user_by_id(
     return current_user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/", response_model=schemas.User)
 def update_user(
-    user_id: uuid.UUID,
     email: Annotated[EmailStr | None, Form()] = None,
     password: Annotated[str | None, Form()] = None,
     nickname: Annotated[str | None, Form()] = None,

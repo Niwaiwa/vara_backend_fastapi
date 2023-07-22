@@ -81,4 +81,15 @@ class ProfileResponse(BaseModel):
     avatar: Optional[str] = None
     header: Optional[str] = None
     description: Optional[str] = None
-    
+
+
+class FollowUser(BaseModel):
+    username: Optional[str]
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+
+
+class FollowUserListResponse(BaseModel):
+    follow_user_list: list[FollowUser] = []
+    page: int
+    count: int
