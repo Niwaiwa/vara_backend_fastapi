@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional, List, Any
 from sqlalchemy import String, Boolean, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -25,9 +26,6 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
-
-    following = relationship('Following', foreign_keys=[Following.user_id], back_populates='following_user', cascade='all, delete-orphan')
-    followers = relationship('Following', foreign_keys=[Following.following_user_id], back_populates='user', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User {self.username}>"

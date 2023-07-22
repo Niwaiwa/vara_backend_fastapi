@@ -88,8 +88,14 @@ class FollowUser(BaseModel):
     nickname: Optional[str] = None
     avatar: Optional[str] = None
 
+    class Config:
+        orm_mode = True
+
 
 class FollowUserListResponse(BaseModel):
     follow_user_list: list[FollowUser] = []
     page: int
     count: int
+
+    class Config:
+        orm_mode = True

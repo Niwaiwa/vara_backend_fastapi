@@ -14,5 +14,5 @@ class Following(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user = relationship('User', foreign_keys=[user_id], back_populates='followers')
-    following_user = relationship('User', foreign_keys=[following_user_id], back_populates='following')
+    user = relationship('User', foreign_keys=[user_id])
+    following_user = relationship('User', foreign_keys=[following_user_id])
