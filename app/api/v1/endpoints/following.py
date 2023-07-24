@@ -31,7 +31,6 @@ def get_following(
     following_usercase = FollowingUseCase(FollowingRepository(db))
     data = following_usercase.get_following_list_by_user_id_and_offset_and_limit(user_id, (page - 1) * limit, limit)
     count = following_usercase.get_following_count(user_id)
-    logger.info(f"data: {data}")
     response_data = [schemas.FollowUser(
         username=user.username,
         nickname=user.nickname,

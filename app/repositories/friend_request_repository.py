@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.user_model import User
 from app.models.friend_request_model import FriendRequest
 from app.repositories.base_repository import BaseRepository
-from app.schemas.friend_schema import FriendRequestCreate, FriendRequestUpdate
+from app.schemas.friend_request_schema import FriendRequestCreate, FriendRequestUpdate
 
 
 class FriendRequestRepository(BaseRepository[FriendRequest, FriendRequestCreate, FriendRequestUpdate]):
@@ -47,8 +47,11 @@ class FriendRequestRepository(BaseRepository[FriendRequest, FriendRequestCreate,
     def is_friend_request(self, from_user_id: uuid.UUID, to_user_id: uuid.UUID) -> bool:
         return self.db.query(FriendRequest).filter(FriendRequest.from_user_id == from_user_id).filter(FriendRequest.to_user_id == to_user_id).first() is not None
     
-    def get_friend_request_count(self, from_user_id: uuid.UUID) -> int:
+    def get_friend_request_count_by_from_user_id(self, from_user_id: uuid.UUID) -> int:
         return self.db.query(FriendRequest).filter(FriendRequest.from_user_id == from_user_id).count()
+    
+    def get_friend_request_count_by_to_user_id(self, to_user_id: uuid.UUID) -> int:
+        return self.db.query(FriendRequest).filter(FriendRequest.to_user_id == to_user_id).count()
     
     def get_friend_request_list_by_from_user_id(self, from_user_id: uuid.UUID) -> list:
         return self.db.query(FriendRequest).filter(FriendRequest.from_user_id == from_user_id).all()
@@ -62,4 +65,18 @@ class FriendRequestRepository(BaseRepository[FriendRequest, FriendRequestCreate,
             self, from_user_id: uuid.UUID, offset: int = 0, limit: int = 100, keyword: str = "") -> list:
         friend_request_list = self.db.query(FriendRequest, User).join(User, User.id == FriendRequest.to_user_id). \
             filter(FriendRequest.from_user_id == from_user_id).filter(User.name.like(f"%{keyword}%")).offset(offset).limit(limit).all()
+        return [friend_request.User for friend_request in friend_request_list]
+
+    def get_friend_request_list_by_to_user_id(self, to_user_id: uuid.UUID) -> list:
+        return self.db.query(FriendRequest).filter(FriendRequest.to_user_id == to_user_id).all()
+    
+    def get_friend_request_list_by_to_user_id_and_offset_and_limit(self, to_user_id: uuid.UUID, offset: int = 0, limit: int = 100) -> list:
+        friend_request_list = self.db.query(FriendRequest, User).join(User, User.id == FriendRequest.from_user_id). \
+            filter(FriendRequest.to_user_id == to_user_id).offset(offset).limit(limit).all()
+        return [friend_request.User for friend_request in friend_request_list]
+    
+    def get_friend_request_list_by_to_user_id_and_offset_and_limit_and_keyword(
+            self, to_user_id: uuid.UUID, offset: int = 0, limit: int = 100, keyword: str = "") -> list:
+        friend_request_list = self.db.query(FriendRequest, User).join(User, User.id == FriendRequest.from_user_id). \
+            filter(FriendRequest.to_user_id == to_user_id).filter(User.name.like(f"%{keyword}%")).offset(offset).limit(limit).all()
         return [friend_request.User for friend_request in friend_request_list]

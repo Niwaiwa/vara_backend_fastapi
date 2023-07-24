@@ -102,3 +102,29 @@ class FollowUserListResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class FriendUser(FollowUser):
+    id: Optional[uuid.UUID] = None
+
+
+class FriendUserListResponse(BaseModel):
+    friend_user_list: list[FriendUser] = []
+    page: int
+    count: int
+
+    class Config:
+        orm_mode = True
+
+
+class FriendRequestUser(FollowUser):
+    id: Optional[uuid.UUID] = None
+
+
+class FriendRequestUserListResponse(BaseModel):
+    friend_request_user_list: list[FriendRequestUser] = []
+    page: int
+    count: int
+
+    class Config:
+        orm_mode = True

@@ -19,6 +19,10 @@ class FriendRequestUpdate(FriendRequestBase):
     pass
 
 
+class FriendRequestUserID(BaseModel):
+    user_id: uuid.UUID
+
+
 class FriendRequestInDBBase(FriendRequestBase):
     id: Optional[uuid.UUID] = None
 

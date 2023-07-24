@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.create_table(
-        'friend',
+        'friends',
         sa.Column('id', sa.UUID(), primary_key=True, nullable=False),
         sa.Column('user_id', sa.UUID(), sa.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True),
         sa.Column('friend_user_id', sa.UUID(), sa.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True), 
@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime, nullable=False),
     )
     op.create_table(
-        'friend_request',
+        'friend_requests',
         sa.Column('id', sa.UUID(), primary_key=True, nullable=False),
         sa.Column('from_user_id', sa.UUID(), sa.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True),
         sa.Column('to_user_id', sa.UUID(), sa.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True),
