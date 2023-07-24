@@ -3,7 +3,8 @@ from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session
 
-from app.models.user_model import Following, User
+from app.models.user_model import User
+from app.models.following_model import Following
 from app.repositories.base_repository import BaseRepository
 from app.schemas.following_schema import FollowingCreate, FollowingUpdate
 
