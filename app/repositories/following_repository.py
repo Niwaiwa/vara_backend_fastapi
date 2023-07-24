@@ -45,6 +45,9 @@ class FollowingRepository(BaseRepository[Following, FollowingCreate, FollowingUp
 
     def is_following(self, user_id: uuid.UUID, following_user_id: uuid.UUID) -> bool:
         return self.db.query(Following).filter(Following.user_id == user_id).filter(Following.following_user_id == following_user_id).first() is not None
+    
+    def is_follower(self, user_id: uuid.UUID, following_user_id: uuid.UUID) -> bool:
+        return self.db.query(Following).filter(Following.user_id == following_user_id).filter(Following.following_user_id == user_id).first() is not None
 
     def get_following_count(self, user_id: uuid.UUID) -> int:
         return self.db.query(Following).filter(Following.user_id == user_id).count()

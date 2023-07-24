@@ -22,6 +22,10 @@ env = get_settings()
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"api/users/login"
 )
+reusable_oauth2_optional = OAuth2PasswordBearer(
+    tokenUrl=f"api/users/login", auto_error=False
+)
+
 
 def get_current_user(
     db: Session = Depends(get_db_connection),
@@ -43,6 +47,29 @@ def get_current_user(
     user = user_usecase.get(token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+def get_current_user_optional(
+    db: Session = Depends(get_db_connection),
+    token: str = Depends(reusable_oauth2_optional),
+) -> Any:
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(
+            token, env.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = schemas.TokenPayload(**payload)
+    except (JWTError, ValidationError) as e:
+        errmsg = str(e).replace('\n', ' ')
+        logger.error(f"{type(e).__name__}: {errmsg}")
+        return None
+    user_usecase = UserUseCase(UserRepository(db))
+    user = user_usecase.get(token_data.sub)
+    if not user:
+        return None
     return user
 
 

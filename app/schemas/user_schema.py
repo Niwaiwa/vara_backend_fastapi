@@ -81,6 +81,9 @@ class ProfileResponse(BaseModel):
     avatar: Optional[str] = None
     header: Optional[str] = None
     description: Optional[str] = None
+    is_following: Optional[bool] = False
+    is_follower: Optional[bool] = False
+    friend: Optional[bool] = False
 
 
 class FollowUser(BaseModel):

@@ -28,6 +28,9 @@ class FollowingUseCase:
     def is_following(self, user_id, following_user_id):
         return self.following_repository.is_following(user_id, following_user_id)
     
+    def is_follower(self, user_id, following_user_id):
+        return self.following_repository.is_follower(user_id, following_user_id)
+    
     def get_following_count(self, user_id):
         return self.following_repository.get_following_count(user_id)
     
