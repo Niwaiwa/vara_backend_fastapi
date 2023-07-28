@@ -80,10 +80,11 @@ def create_friend(
             'message': 'success',
         }
 
-    friend_usercase.create(schemas.FriendCreate(
-        user_id=current_user.id,
-        friend_user_id=friend_data.friend_user_id,
+    friend_request_usercase.create(schemas.FriendRequestCreate(
+        from_user_id=current_user.id,
+        to_user_id=friend_data.friend_user_id,
     ))
+
     return {
         'message': 'success',
     }
