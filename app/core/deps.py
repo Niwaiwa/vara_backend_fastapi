@@ -112,4 +112,24 @@ def upload_image(file: UploadFile, settings: config.Settings) -> Any:
     with open(f"{settings.UPLOAD_IMAGE_PATH}/{filename}", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    return f"{settings.UPLOAD_IMAGE_URL}/{filename}"
+    return f"{settings.UPLOAD_IMAGE_PATH}/{filename}"
+
+
+def upload_video(file: UploadFile, settings: config.Settings) -> Any:
+    filename = file.filename
+    file_size = file.file.seek(0, 2)
+    logger.info(f"filename: {filename}, file_size: {file_size}")
+    if file_size > settings.UPLOAD_VIDEO_SIZE_LIMIT:
+        raise HTTPException(status_code=400, detail="File too large")
+    
+    content_type = file.content_type
+    logger.info(f"content_type: {content_type}")
+    if content_type not in settings.UPLOAD_VIDEO_TYPE:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+    
+    filename = f"{uuid.uuid4()}.{filename.split('.')[-1]}"
+    file.file.seek(0)
+    with open(f"{settings.UPLOAD_VIDEO_PATH}/{filename}", "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return f"{settings.UPLOAD_VIDEO_PATH}/{filename}"

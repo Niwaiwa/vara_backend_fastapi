@@ -21,8 +21,8 @@ class Video(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    user = relationship("User", back_populates="videos")
-    video_likes = relationship("VideoLike", back_populates="video")
+    user = relationship("User", foreign_keys=[user_id])
+    video_likes = relationship("VideoLike", foreign_keys=[id], backref="video_likes", primaryjoin="Video.id==VideoLike.video_id")
     tags = relationship("Tag", secondary="video_tags", back_populates="videos")
 
 
@@ -44,5 +44,5 @@ class VideoLike(Base):
     video_id = mapped_column(UUID(as_uuid=True), ForeignKey('videos.id'), nullable=False)
     created_at = mapped_column(DateTime, default=datetime.now())
 
-    user = relationship("User", back_populates="video_likes")
-    video = relationship("Video", back_populates="video_likes")
+    # user = relationship("User", back_populates="video_likes")
+    # video = relationship("Video", back_populates="video_likes")

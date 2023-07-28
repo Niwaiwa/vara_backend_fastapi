@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.schemas.user_schema import User
+from app.schemas.user_schema import User, ContentUser
 
 
 class VideoBase(BaseModel):
@@ -19,8 +19,11 @@ class VideoCreate(VideoBase):
     pass
 
 
-class VideoUpdate(VideoBase):
-    pass
+class VideoUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    rating: str | None = None
+    tags: list[str] | None = None
 
 
 class VideoInDBBase(VideoBase):
@@ -40,7 +43,7 @@ class Video(VideoInDBBase):
 
 class VideoResponse(BaseModel):
     id: Optional[uuid.UUID] = None
-    user: Optional[User] = None
+    user: Optional[ContentUser] = None
     title: Optional[str] = None
     description: Optional[str] = None
     video_file: Optional[str] = None
@@ -51,6 +54,7 @@ class VideoResponse(BaseModel):
     created_at: Optional[datetime.datetime] = None
     updated_at: Optional[datetime.datetime] = None
     tags: Optional[list] = None
+    is_liked: Optional[bool] = False
 
 
 class VideoListResponse(BaseModel):

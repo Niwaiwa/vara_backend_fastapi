@@ -1,4 +1,3 @@
-from app.core.security import get_password_hash, verify_password
 from app.repositories.video_repository import VideoRepository
 
 
@@ -61,3 +60,6 @@ class VideoUseCase:
 
     def get_video_list_by_offset_and_limit_and_rating_and_tag_count(self, offset: int = 0, limit: int = 100, rating: str = 'G', tag: str = ''):
         return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tag_count(offset, limit, rating, tag)
+
+    def is_video_liked(self, user_id, video_id):
+        return self.videoRepository.is_video_liked(user_id, video_id)

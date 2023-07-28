@@ -1,0 +1,223 @@
+import logging
+import uuid
+from typing import Any, Annotated
+
+from fastapi import APIRouter, Body, Depends, File, Form, UploadFile
+from fastapi.exceptions import HTTPException
+from sqlalchemy.orm import Session
+
+from app import schemas, models, config
+from app.usecase.user_usecase import UserUseCase
+from app.usecase.video_usecase import VideoUseCase
+from app.repositories.user_repository import UserRepository
+from app.repositories.video_repository import VideoRepository
+from app.config import get_settings
+from app.db.database import get_db_connection
+from app.core.deps import get_current_user, get_current_user_optional, upload_video
+
+logger = logging.getLogger(__name__)
+router = APIRouter()
+
+
+@router.get("")
+def get_video(
+    page: int = 1,
+    limit: int = 30,
+    db: Session = Depends(get_db_connection),
+) -> Any:
+    """
+    Get a specific video by id.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    data = video_usecase.get_video_list_by_offset_and_limit_and_rating((page - 1) * limit, limit)
+    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_count()
+
+    response_data = [schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+    ) for video in data]
+    return {
+        'data': response_data,
+        'page': page,
+        'count': count,
+    }
+
+
+@router.get("/{video_id}", response_model=schemas.VideoResponse)
+def get_video_by_id(
+    video_id: uuid.UUID,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user_optional),
+) -> Any:
+    """
+    Get a specific video by id.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video = video_usecase.get(video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    is_liked = False
+    if current_user:
+        is_liked = video_usecase.is_video_liked(current_user.id, video.id)
+
+    response_data = schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+        is_liked=is_liked,
+    )
+    return response_data
+
+
+@router.post("", response_model=schemas.VideoResponse)
+def create_video(
+    title: Annotated[str | None, Form()] = None,
+    description: Annotated[str | None, Form()] = None,
+    video_file: Annotated[UploadFile | None, File()] = None,
+    video_url: Annotated[str | None, Form()] = None,
+    rating: Annotated[str | None, Form()] = None,
+    tags: Annotated[list[str] | None, Form()] = None,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user),
+    settings: config.Settings = Depends(get_settings),
+) -> Any:
+    """
+    Create a video.
+    """
+    video_filename = None
+
+    if not video_url and not video_file:
+        raise HTTPException(status_code=400, detail="video_url or video_file is required")
+
+    if video_file:
+        video_filename = upload_video(video_file, settings)
+
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video_create_data = schemas.VideoCreate(
+        user_id=current_user.id,
+        title=title,
+        description=description,
+        video_file=video_filename,
+        video_url=video_url,
+        rating=rating,
+    )
+
+    video = video_usecase.create(
+        video_create_data,
+        tags,
+    )
+
+    return schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+    )
+
+
+@router.put("/{video_id}", response_model=schemas.VideoResponse)
+def update_video(
+    video_id: uuid.UUID,
+    update_data: schemas.VideoUpdate,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user),
+) -> Any:
+    """
+    Update a video.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video = video_usecase.get(video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    tags = update_data.tags
+    update_data.tags = None
+    video_update_data = update_data.dict(exclude_unset=True)
+
+    video = video_usecase.update(
+        video_id,
+        video_update_data,
+        tags,
+    )
+
+    return schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+    )
+
+
+@router.delete("/{video_id}")
+def delete_video(
+    video_id: uuid.UUID,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user),
+) -> Any:
+    """
+    Delete a video.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video = video_usecase.get(video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    video_usecase.delete(video_id)
+
+    return None
