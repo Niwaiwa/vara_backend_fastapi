@@ -83,7 +83,8 @@ class ProfileResponse(BaseModel):
     description: Optional[str] = None
     is_following: Optional[bool] = False
     is_follower: Optional[bool] = False
-    friend: Optional[bool] = False
+    is_friend: Optional[bool] = False
+    is_friend_request: Optional[bool] = False
 
 
 class FollowUser(BaseModel):
