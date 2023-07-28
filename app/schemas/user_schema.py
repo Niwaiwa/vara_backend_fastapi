@@ -74,6 +74,13 @@ class LoginUserResponse(BaseModel):
     token_type: str
 
 
+class ContentUser(BaseModel):
+    username: Optional[str] = None
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+    is_following: Optional[bool] = False
+
+
 class ProfileResponse(BaseModel):
     id: Optional[uuid.UUID] = None
     username: Optional[str] = None
