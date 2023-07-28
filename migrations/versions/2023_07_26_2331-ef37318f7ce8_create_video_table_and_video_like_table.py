@@ -26,8 +26,8 @@ def upgrade() -> None:
         sa.Column('video_file', sa.String(length=255), nullable=True),
         sa.Column('video_url', sa.String(length=255), nullable=True),
         sa.Column('rating', sa.CHAR(length=2), nullable=False),
-        sa.Column('view_count', sa.Integer(), nullable=False, default=0),
-        sa.Column('like_count', sa.Integer(), nullable=False, default=0),
+        sa.Column('views_count', sa.Integer(), nullable=False, default=0),
+        sa.Column('likes_count', sa.Integer(), nullable=False, default=0),
         sa.Column('created_at', sa.DateTime, nullable=False),
         sa.Column('updated_at', sa.DateTime, nullable=False),
     )
