@@ -2,7 +2,7 @@ import logging
 import uuid
 from typing import Any, Annotated
 
-from fastapi import APIRouter, Body, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Body, Depends, File, Form, UploadFile, Query
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 
@@ -23,14 +23,20 @@ router = APIRouter()
 def get_video(
     page: int = 1,
     limit: int = 30,
+    rating: str = 'G',
+    tags: list[str] = Query(None, alias='tag'),
     db: Session = Depends(get_db_connection),
 ) -> Any:
     """
     Get a specific video by id.
     """
     video_usecase = VideoUseCase(VideoRepository(db))
-    data = video_usecase.get_video_list_by_offset_and_limit_and_rating((page - 1) * limit, limit)
-    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_count()
+    if tags:
+        data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag((page - 1) * limit, limit, rating, tags)
+        count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(rating, tags)
+    else:
+        data = video_usecase.get_video_list_by_offset_and_limit_and_rating((page - 1) * limit, limit)
+        count = video_usecase.get_video_list_by_offset_and_limit_and_rating_count()
 
     response_data = [schemas.VideoResponse(
         id=video.id,
@@ -101,11 +107,11 @@ def get_video_by_id(
 
 @router.post("", response_model=schemas.VideoResponse)
 def create_video(
-    title: Annotated[str | None, Form()] = None,
-    description: Annotated[str | None, Form()] = None,
+    title: Annotated[str, Form(...)],
+    description: Annotated[str, Form(...)],
+    rating: Annotated[str, Form(...)],   
     video_file: Annotated[UploadFile | None, File()] = None,
     video_url: Annotated[str | None, Form()] = None,
-    rating: Annotated[str | None, Form()] = None,
     tags: Annotated[list[str] | None, Form()] = None,
     db: Session = Depends(get_db_connection),
     current_user: models.User = Depends(get_current_user),
@@ -221,3 +227,86 @@ def delete_video(
     video_usecase.delete(video_id)
 
     return None
+
+
+@router.post("/{video_id}/like", response_model=schemas.VideoResponse)
+def like_video(
+    video_id: uuid.UUID,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user),
+) -> Any:
+    """
+    Like a video.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video = video_usecase.get(video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    is_liked = video_usecase.is_video_liked(current_user.id, video.id)
+    if is_liked:
+        raise HTTPException(status_code=400, detail="Already liked")
+
+    video_usecase.like_video(current_user.id, video_id)
+
+    return schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+        is_liked=True,
+    )
+
+
+@router.post("/{video_id}/unlike", response_model=schemas.VideoResponse)
+def unlike_video(
+    video_id: uuid.UUID,
+    db: Session = Depends(get_db_connection),
+    current_user: models.User = Depends(get_current_user),
+) -> Any:
+    """
+    Unlike a video.
+    """
+    video_usecase = VideoUseCase(VideoRepository(db))
+    video = video_usecase.get(video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    is_liked = video_usecase.is_video_liked(current_user.id, video.id)
+    if not is_liked:
+        raise HTTPException(status_code=400, detail="Not liked yet")
+
+    video_usecase.unlike_video(current_user.id, video_id)
+
+    return schemas.VideoResponse(
+        id=video.id,
+        user=schemas.ContentUser(
+            username=video.user.username,
+            nickname=video.user.nickname,
+            avatar=video.user.avatar,
+            is_following=False,
+        ),
+        title=video.title,
+        description=video.description,
+        video_file=video.video_file,
+        video_url=video.video_url,
+        views_count=video.views_count,
+        likes_count=video.likes_count,
+        created_at=video.created_at,
+        updated_at=video.updated_at,
+        tags=video.tags,
+        rating=video.rating,
+    )

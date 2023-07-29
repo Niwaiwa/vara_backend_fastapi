@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 from sqlalchemy.orm import Session
 
 from app.models.user_model import User
-from app.models.video_model import Video
+from app.models.video_model import Video, VideoLike
 from app.models.tag_model import Tag
 from app.repositories.base_repository import BaseRepository
 from app.schemas.video_schema import VideoCreate, VideoUpdate
@@ -71,84 +71,60 @@ class VideoRepository(BaseRepository[Video, VideoCreate, VideoUpdate]):
         return self.db.query(Video).filter(Video.user_id == user_id).all()
 
     def get_video_list_by_user_id_and_offset_and_limit(self, user_id: uuid.UUID, offset: int = 0, limit: int = 100) -> list:
-        video_list = self.db.query(Video, User).join(User, User.id == Video.user_id). \
-            filter(Video.user_id == user_id).offset(offset).limit(limit).all()
-        return [user for _, user in video_list]
+        return self.db.query(Video).filter(Video.user_id == user_id).offset(offset).limit(limit).all()
+    
+    def get_video_list_by_user_id_and_offset_and_limit_count(self, user_id: uuid.UUID) -> int:
+        return self.db.query(Video).filter(Video.user_id == user_id).count()
     
     def get_video_list_by_user_id_and_offset_and_limit_and_rating(self, user_id: uuid.UUID, offset: int = 0, limit: int = 100, rating: str = 'G') -> list:
-        video_list = self.db.query(Video, User).join(User, User.id == Video.user_id). \
-            filter(Video.user_id == user_id).filter(Video.rating == rating).offset(offset).limit(limit).all()
-        return [user for _, user in video_list]
-
-    def get_video_list_by_offset_and_limit(self, offset: int = 0, limit: int = 100) -> list:
-        video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-            offset(offset).limit(limit).all()
-        return_list = []
-        for video, user, tag in video_list:
-            video.user = user
-            video.tags = tag
-            return_list.append(video)
-        return return_list
+        return self.db.query(Video).filter(Video.user_id == user_id).filter(Video.rating == rating).offset(offset).limit(limit).all()
+    
+    def get_video_list_by_user_id_and_offset_and_limit_and_rating_count(self, user_id: uuid.UUID, rating: str = 'G') -> int:
+        return self.db.query(Video).filter(Video.user_id == user_id).filter(Video.rating == rating).count()
 
     def get_video_list_by_offset_and_limit_and_rating(self, offset: int = 0, limit: int = 100, rating: str = 'G') -> list:
         return self.db.query(Video).filter(Video.rating == rating).offset(offset).limit(limit).all()
-        # video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-        #     filter(Video.rating == rating).offset(offset).limit(limit).all()
-        # return_list = []
-        # for video, user, tag in video_list:
-        #     video.user = user
-        #     video.tags = tag
-        #     return_list.append(video)
-        # return return_list
     
-    def get_video_list_by_offset_and_limit_and_rating_count(self, offset: int = 0, limit: int = 100, rating: str = 'G') -> int:
+    def get_video_list_by_offset_and_limit_and_rating_count(self, rating: str = 'G') -> int:
         return self.db.query(Video).filter(Video.rating == rating).count()
 
-    def get_video_list_by_offset_and_limit_and_keyword(self, offset: int = 0, limit: int = 100, keyword: str = "") -> list:
-        video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-            filter(Video.title.like(f'%{keyword}%')).offset(offset).limit(limit).all()
-        return_list = []
-        for video, user, tag in video_list:
-            video.user = user
-            video.tags = tag
-            return_list.append(video)
-        return return_list
-
     def get_video_list_by_offset_and_limit_and_rating_and_keyword(self, offset: int = 0, limit: int = 100, rating: str = 'G', keyword: str = "") -> list:
-        video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-            filter(Video.rating == rating).filter(Video.title.like(f'%{keyword}%')).offset(offset).limit(limit).all()
-        return_list = []
-        for video, user, tag in video_list:
-            video.user = user
-            video.tags = tag
-            return_list.append(video)
-        return return_list
-    
-    def get_video_list_by_offset_and_limit_and_rating_and_keyword_count(self, offset: int = 0, limit: int = 100, rating: str = 'G', keyword: str = "") -> int:
+        return self.db.query(Video).filter(Video.rating == rating).filter(Video.title.like(f'%{keyword}%')).offset(offset).limit(limit).all()
+
+    def get_video_list_by_offset_and_limit_and_rating_and_keyword_count(self, rating: str = 'G', keyword: str = "") -> int:  
         return self.db.query(Video).filter(Video.rating == rating).filter(Video.title.like(f'%{keyword}%')).count()
 
-    def get_video_list_by_offset_and_limit_and_tag(self, offset: int = 0, limit: int = 100, tag: str = "") -> list:
-        video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-            filter(Tag.name == tag).offset(offset).limit(limit).all()
-        return_list = []
-        for video, user, tag in video_list:
-            video.user = user
-            video.tags = tag
-            return_list.append(video)
-        return return_list
-
     def get_video_list_by_offset_and_limit_and_rating_and_tag(self, offset: int = 0, limit: int = 100, rating: str = 'G', tag: str = "") -> list:
-        video_list = self.db.query(Video, User, Tag).join(User, User.id == Video.user_id).join(Tag, Tag.id == Video.tags). \
-            filter(Video.rating == rating).filter(Tag.name == tag).offset(offset).limit(limit).all()
-        return_list = []
-        for video, user, tag in video_list:
-            video.user = user
-            video.tags = tag
-            return_list.append(video)
-        return return_list
+        return self.db.query(Video).filter(Video.rating == rating).filter(Tag.name == tag).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_tag_count(self, offset: int = 0, limit: int = 100, rating: str = 'G', tag: str = "") -> int:
+    def get_video_list_by_offset_and_limit_and_rating_and_tag_count(self, rating: str = 'G', tag: str = "") -> int:
         return self.db.query(Video).filter(Video.rating == rating).filter(Tag.name == tag).count()
     
+    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+        return self.db.query(Video).distinct(Video.id).join(Video.tags).filter(Video.rating == rating).filter(Tag.name.in_(tags)).offset(offset).limit(limit).all()
+    
+    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(self, rating: str = 'G', tags: list = []) -> int:
+        return self.db.query(Video).distinct(Video.id).join(Video.tags).filter(Video.rating == rating).filter(Tag.name.in_(tags)).count()
+    
     def is_video_liked(self, user_id: uuid.UUID, video_id: uuid.UUID) -> bool:
-        return self.db.query(Video).filter(Video.id == video_id).filter(Video.video_likes.any(user_id=user_id)).count() > 0
+        return self.db.query(Video).filter(Video.id == video_id).filter(Video.video_likes.has(user_id=user_id)).count() > 0
+    
+    def like_video(self, user_id: uuid.UUID, video_id: uuid.UUID) -> Video:
+        video = self.db.query(Video).filter(Video.id == video_id).first()
+        video.likes_count += 1
+        video_like = VideoLike(user_id=user_id, video_id=video_id)
+        self.db.add(video_like)
+        self.db.add(video)
+        self.db.commit()
+        self.db.refresh(video)
+        return video
+    
+    def unlike_video(self, user_id: uuid.UUID, video_id: uuid.UUID) -> Video:
+        video = self.db.query(Video).filter(Video.id == video_id).first()
+        video.likes_count -= 1
+        video_like = self.db.query(VideoLike).filter(VideoLike.user_id == user_id).filter(VideoLike.video_id == video_id).first()
+        self.db.delete(video_like)
+        self.db.add(video)
+        self.db.commit()
+        self.db.refresh(video)
+        return video
