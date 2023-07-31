@@ -12,9 +12,13 @@ class Settings(BaseSettings):
     DB_URL: str = "postgresql://postgres:password@localhost:5432/vara"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     UPLOAD_IMAGE_TYPE: list = ["image/jpeg", "image/png", "image/gif"]
-    UPLOAD_IMAGE_SIZE_LIMIT: int = 2 * 1024 * 1024
+    UPLOAD_IMAGE_SIZE_LIMIT: int = 10 * 1024 * 1024  # 10MB
     UPLOAD_IMAGE_PATH: str = "media/images"
     UPLOAD_IMAGE_URL: str = "/media/images"
+    UPLOAD_VIDEO_TYPE: list = ["video/mp4"]
+    UPLOAD_VIDEO_SIZE_LIMIT: int = 300 * 1024 * 1024  # 300MB
+    UPLOAD_VIDEO_PATH: str = "media/videos"
+    UPLOAD_VIDEO_URL: str = "/media/videos"
 
     class Config:
         env_file = "../.env"
