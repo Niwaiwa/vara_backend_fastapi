@@ -25,3 +25,9 @@ PYTHONPATH=./ alembic.exe downgrade -1
 ```bash
 python initial_data.py
 ```
+
+## db
+
+```bash
+docker-compose -f docker-postgres.yml up -d
+```
