@@ -30,6 +30,7 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
             username=obj_in.username,
             email=obj_in.email,
             password=hashed_password,
+            nickname=obj_in.username,
             is_superuser=obj_in.is_superuser,
         )
         self.db.add(db_obj)
