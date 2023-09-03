@@ -24,6 +24,7 @@ def get_video(
     page: int = 1,
     limit: int = 30,
     rating: str = 'G',
+    sort: str = 'latest',
     tags: list[str] = Query(None, alias='tag'),
     db: Session = Depends(get_db_connection),
 ) -> Any:
@@ -31,12 +32,8 @@ def get_video(
     Get a specific video by id.
     """
     video_usecase = VideoUseCase(VideoRepository(db))
-    if tags:
-        data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag((page - 1) * limit, limit, rating, tags)
-        count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(rating, tags)
-    else:
-        data = video_usecase.get_video_list_by_offset_and_limit_and_rating((page - 1) * limit, limit)
-        count = video_usecase.get_video_list_by_offset_and_limit_and_rating_count()
+    data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort((page - 1) * limit, limit, rating, tags, sort)
+    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_count(rating, tags, sort)
 
     response_data = [schemas.VideoResponse(
         id=video.id,
