@@ -59,3 +59,9 @@ class TagRepository(BaseRepository[Tag, TagCreate, TagUpdate]):
     
     def get_tag_list_by_offset_and_limit_and_keyword_count(self, keyword: str = ''):
         return self.db.query(Tag).filter(Tag.name.like('%' + keyword + '%')).count()
+    
+    def get_tag_list_by_offset_and_limit_and_keyword_prefix(self, offset: int = 0, limit: int = 100, keyword: str = ''):
+        return self.db.query(Tag).filter(Tag.name.startswith(keyword)).order_by(Tag.name).offset(offset).limit(limit).all()
+    
+    def get_tag_list_by_offset_and_limit_and_keyword_prefix_count(self, keyword: str = ''):
+        return self.db.query(Tag).filter(Tag.name.startswith(keyword)).count()

@@ -30,8 +30,8 @@ def get_tag(
     """
     tag_usecase = TagUseCase(TagRepository(db))
     if keyword != '':
-        data = tag_usecase.get_tag_list_by_offset_and_limit_and_keyword((page - 1) * limit, limit, keyword)
-        count = tag_usecase.get_tag_list_by_offset_and_limit_and_keyword_count(keyword)
+        data = tag_usecase.get_tag_list_by_offset_and_limit_and_keyword_prefix((page - 1) * limit, limit, keyword)
+        count = tag_usecase.get_tag_list_by_offset_and_limit_and_keyword_prefix_count(keyword)
     else:
         data = tag_usecase.get_tag_list_by_offset_and_limit((page - 1) * limit, limit)
         count = tag_usecase.get_tag_list_by_offset_and_limit_count()

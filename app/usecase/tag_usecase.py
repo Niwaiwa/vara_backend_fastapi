@@ -39,3 +39,9 @@ class TagUseCase:
     
     def get_tag_list_by_offset_and_limit_and_keyword_count(self, keyword: str = ''):
         return self.tagRepository.get_tag_list_by_offset_and_limit_and_keyword_count(keyword)
+    
+    def get_tag_list_by_offset_and_limit_and_keyword_prefix(self, offset: int = 0, limit: int = 100, keyword: str = ''):
+        return self.tagRepository.get_tag_list_by_offset_and_limit_and_keyword_prefix(offset, limit, keyword)
+    
+    def get_tag_list_by_offset_and_limit_and_keyword_prefix_count(self, keyword: str = ''):
+        return self.tagRepository.get_tag_list_by_offset_and_limit_and_keyword_prefix_count(keyword)
