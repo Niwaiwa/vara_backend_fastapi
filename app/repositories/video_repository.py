@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Dict, Optional, Union
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 from app.models.user_model import User
 from app.models.video_model import Video, VideoLike
@@ -100,62 +100,49 @@ class VideoRepository(BaseRepository[Video, VideoCreate, VideoUpdate]):
     def get_video_list_by_offset_and_limit_and_rating_and_tag_count(self, rating: str = 'G', tag: str = "") -> int:
         return self.db.query(Video).filter(Video.rating == rating).filter(Tag.name == tag).count()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+    def get_video_list_by_offset_and_limit_and_rating_and_tags(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
         return self.db.query(Video).distinct(Video.id).join(Video.tags).filter(Video.rating == rating).filter(Tag.name.in_(tags)).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(self, rating: str = 'G', tags: list = []) -> int:
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_count(self, rating: str = 'G', tags: list = []) -> int:
         return self.db.query(Video).distinct(Video.id).join(Video.tags).filter(Video.rating == rating).filter(Tag.name.in_(tags)).count()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_latest(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_latest(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.created_at.desc()).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_latest_count(self, rating: str = 'G', tags: list = []) -> int:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_latest_count(self, rating: str = 'G', tags: list = []) -> int:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.created_at.desc()).count()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_oldest(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_oldest(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.created_at.asc()).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_oldest_count(self, rating: str = 'G', tags: list = []) -> int:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_oldest_count(self, rating: str = 'G', tags: list = []) -> int:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.created_at.asc()).count()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_views(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_views(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.views_count.desc()).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_views_count(self, rating: str = 'G', tags: list = []) -> int:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_views_count(self, rating: str = 'G', tags: list = []) -> int:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.views_count.desc()).count()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_likes(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_likes(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []) -> list:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.likes_count.desc()).offset(offset).limit(limit).all()
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_likes_count(self, rating: str = 'G', tags: list = []) -> int:
-        q = self.db.query(Video)
-        if tags:
-            q = q.distinct(Video.id).join(Video.tags).filter(Tag.name.in_(tags))
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_likes_count(self, rating: str = 'G', tags: list = []) -> int:
+        q = self._query_video_by_tags(tags)
         return q.filter(Video.rating == rating).order_by(Video.likes_count.desc()).count()
     
-    def is_video_liked(self, user_id: uuid.UUID, video_id: uuid.UUID) -> bool:
-        return self.db.query(Video).filter(Video.id == video_id).filter(Video.video_likes.has(user_id=user_id)).count() > 0
+    def _query_video_by_tags(self, tags: list) -> Query:
+        q = self.db.query(Video)
+        if tags:
+            q = q.join(Video.tags).filter(Tag.name.in_(tags))
+        return q
     
     def like_video(self, user_id: uuid.UUID, video_id: uuid.UUID) -> Video:
         video = self.db.query(Video).filter(Video.id == video_id).first()

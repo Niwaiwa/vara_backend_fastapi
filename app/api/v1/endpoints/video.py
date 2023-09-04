@@ -32,8 +32,8 @@ def get_video(
     Get a specific video by id.
     """
     video_usecase = VideoUseCase(VideoRepository(db))
-    data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort((page - 1) * limit, limit, rating, tags, sort)
-    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_count(rating, tags, sort)
+    data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort((page - 1) * limit, limit, rating, tags, sort)
+    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_count(rating, tags, sort)
 
     response_data = [schemas.VideoResponse(
         id=video.id,

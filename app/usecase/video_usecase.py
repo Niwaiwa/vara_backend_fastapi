@@ -52,31 +52,31 @@ class VideoUseCase:
     def get_video_list_by_offset_and_limit_and_rating_and_tag_count(self, rating: str = 'G', tag: str = ''):
         return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tag_count(rating, tag)
 
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []):
-        return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag(offset, limit, rating, tags)
+    def get_video_list_by_offset_and_limit_and_rating_and_tags(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = []):
+        return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags(offset, limit, rating, tags)
 
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(self, rating: str = 'G', tags: list = []):
-        return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_count(rating, tags)
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_count(self, rating: str = 'G', tags: list = []):
+        return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_count(rating, tags)
     
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = [], sort: str = 'latest'):
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort(self, offset: int = 0, limit: int = 100, rating: str = 'G', tags: list = [], sort: str = 'latest'):
         if sort == 'oldest':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_oldest(offset, limit, rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_oldest(offset, limit, rating, tags)
         elif sort == 'views':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_views(offset, limit, rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_views(offset, limit, rating, tags)
         elif sort == 'likes':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_likes(offset, limit, rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_likes(offset, limit, rating, tags)
         else:
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_latest(offset, limit, rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_latest(offset, limit, rating, tags)
         
-    def get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_count(self, rating: str = 'G', tags: list = [], sort: str = 'latest'):
+    def get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_count(self, rating: str = 'G', tags: list = [], sort: str = 'latest'):
         if sort == 'oldest':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_oldest_count(rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_oldest_count(rating, tags)
         elif sort == 'views':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_views_count(rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_views_count(rating, tags)
         elif sort == 'likes':
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_likes_count(rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_likes_count(rating, tags)
         else:
-            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_multiple_tag_and_sort_latest_count(rating, tags)
+            return self.videoRepository.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_latest_count(rating, tags)
 
     def is_video_liked(self, user_id, video_id):
         return self.videoRepository.is_video_liked(user_id, video_id)
