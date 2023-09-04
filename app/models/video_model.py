@@ -18,8 +18,8 @@ class Video(Base):
     rating: Mapped[str] = mapped_column(CHAR(2), nullable=False, default="G")
     views_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     likes_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", foreign_keys=[user_id])
     video_likes = relationship("VideoLike", foreign_keys=[id], primaryjoin="Video.id==VideoLike.video_id")
@@ -42,4 +42,4 @@ class VideoLike(Base):
     id = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = mapped_column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     video_id = mapped_column(UUID(as_uuid=True), ForeignKey('videos.id', ondelete='CASCADE'), nullable=False)
-    created_at = mapped_column(DateTime, default=datetime.now())
+    created_at = mapped_column(DateTime, default=datetime.utcnow)
