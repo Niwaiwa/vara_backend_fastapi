@@ -144,6 +144,9 @@ class VideoRepository(BaseRepository[Video, VideoCreate, VideoUpdate]):
             q = q.join(Video.tags).filter(Tag.name.in_(tags))
         return q
     
+    def is_video_liked(self, user_id: uuid.UUID, video_id: uuid.UUID) -> bool:
+        return self.db.query(Video).filter(Video.id == video_id).filter(Video.video_likes.has(user_id=user_id)).count() > 0
+    
     def like_video(self, user_id: uuid.UUID, video_id: uuid.UUID) -> Video:
         video = self.db.query(Video).filter(Video.id == video_id).first()
         video.likes_count += 1
