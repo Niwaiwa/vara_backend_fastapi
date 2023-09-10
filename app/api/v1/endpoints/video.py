@@ -31,9 +31,9 @@ def get_video(
     """
     Get a specific video by id.
     """
-    if rating not in ['G', 'E', 'All']:
+    if rating not in ['G', 'E', 'All', 'all']:
         rating = 'G'
-    elif rating == 'All':
+    elif rating == 'All' or rating == 'all':
         rating = ''
 
     video_usecase = VideoUseCase(VideoRepository(db))
