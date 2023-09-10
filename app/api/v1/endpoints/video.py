@@ -31,6 +31,11 @@ def get_video(
     """
     Get a specific video by id.
     """
+    if rating not in ['G', 'E', 'All']:
+        rating = 'G'
+    elif rating == 'All':
+        rating = ''
+
     video_usecase = VideoUseCase(VideoRepository(db))
     data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort((page - 1) * limit, limit, rating, tags, sort)
     count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_count(rating, tags, sort)
@@ -124,6 +129,9 @@ def create_video(
 
     if video_file:
         video_filename = upload_video(video_file, settings)
+
+    if rating not in ['G', 'E']:
+        raise HTTPException(status_code=400, detail="Invalid rating")
 
     video_usecase = VideoUseCase(VideoRepository(db))
     video_create_data = schemas.VideoCreate(
