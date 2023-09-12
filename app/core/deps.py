@@ -2,6 +2,7 @@ import logging
 import uuid
 import shutil
 import os
+import math
 from typing import Any
 
 from fastapi import Depends, HTTPException, status, UploadFile
@@ -10,6 +11,7 @@ from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from moviepy.editor import VideoFileClip
+from PIL import Image
 
 from app import models, schemas, config
 from app.core import security
@@ -156,7 +158,35 @@ def generate_video_thumbnails(settings: config.Settings, video_path, file_id, nu
 
         clip.close()
 
+        for i, thumbnail in enumerate(thumbnails):
+            thumbnail_path = os.path.join(thumbnail_relate_path, f"thumbnails_{i}.jpg")
+            generate_video_image_thumbnail(thumbnail_path)
+
         return True
     except Exception as e:
         logger.error(f"{type(e).__name__}: {str(e)}")
         return False
+    
+
+def generate_video_image_thumbnail(thumbnail_path, size=(220, 160)):
+    origin_path = thumbnail_path
+    image = Image.open(origin_path)
+
+    # アスペクト比を維持しながらサイズ変更
+    width, height = image.size
+    target_width, target_height = size
+    aspect_ratio = min(target_width / width, target_height / height)
+    resized_width = math.floor(width * aspect_ratio)
+    resized_height = math.floor(height * aspect_ratio)
+    resized_image = image.resize((resized_width, resized_height), Image.LANCZOS)
+
+    # 黒い背景で指定したサイズに埋め込む
+    background = Image.new('RGB', size, (0, 0, 0))
+    offset = ((target_width - resized_width) // 2, (target_height - resized_height) // 2)
+    background.paste(resized_image, offset)
+    image.close()
+
+    # サムネイルを保存
+    background.save(thumbnail_path)
+
+    return True
