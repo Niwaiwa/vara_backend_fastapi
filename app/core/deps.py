@@ -1,6 +1,7 @@
 import logging
 import uuid
 import shutil
+import os
 from typing import Any
 
 from fastapi import Depends, HTTPException, status, UploadFile
@@ -8,6 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
+from moviepy.editor import VideoFileClip
 
 from app import models, schemas, config
 from app.core import security
@@ -133,3 +135,28 @@ def upload_video(file: UploadFile, settings: config.Settings) -> Any:
         shutil.copyfileobj(file.file, buffer)
 
     return f"{settings.UPLOAD_VIDEO_PATH}/{filename}"
+
+
+def generate_video_thumbnails(settings: config.Settings, video_path, file_id, num_thumbnails: int = 12):
+    # origin_path = os.path.join(settings.UPLOAD_VIDEO_PATH, video_path)
+    try:
+        origin_path = video_path
+        clip = VideoFileClip(origin_path)
+        duration = clip.duration
+        interval = duration / num_thumbnails
+        thumbnails = []
+
+        thumbnail_relate_path = os.path.join(settings.UPLOAD_VIDEO_PATH, f"thumbnails/{file_id}")
+        os.makedirs(thumbnail_relate_path, exist_ok=True)
+        for i in range(num_thumbnails):
+            time = i * interval
+            thumbnail_path = os.path.join(thumbnail_relate_path, f"thumbnails_{i}.jpg")
+            thumbnail = clip.save_frame(thumbnail_path, time)
+            thumbnails.append(thumbnail)
+
+        clip.close()
+
+        return True
+    except Exception as e:
+        logger.error(f"{type(e).__name__}: {str(e)}")
+        return False

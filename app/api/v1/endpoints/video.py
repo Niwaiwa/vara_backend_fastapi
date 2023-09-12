@@ -13,7 +13,7 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.video_repository import VideoRepository
 from app.config import get_settings
 from app.db.database import get_db_connection
-from app.core.deps import get_current_user, get_current_user_optional, upload_video
+from app.core.deps import get_current_user, get_current_user_optional, upload_video, generate_video_thumbnails
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -147,6 +147,10 @@ def create_video(
         video_create_data,
         tags,
     )
+
+    thumbnail_result = generate_video_thumbnails(settings, video.video_file, video.id)
+    if thumbnail_result:
+        logger.info(f"thumbnail_result: {thumbnail_result}")
 
     return schemas.VideoResponse(
         id=video.id,
