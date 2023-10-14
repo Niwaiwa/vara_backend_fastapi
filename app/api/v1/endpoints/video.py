@@ -26,19 +26,42 @@ def get_video(
     rating: str = 'G',
     sort: str = 'latest',
     tags: list[str] = Query(None, alias='tag'),
+    user_id: uuid.UUID = Query('', alias='user'),
     db: Session = Depends(get_db_connection),
 ) -> Any:
     """
     Get a specific video by id.
     """
+    if user_id:
+        user_usecase = UserUseCase(UserRepository(db))
+        user = user_usecase.get(user_id)
+        if not user:
+            return {
+                'data': [],
+                'page': page,
+                'count': 0,
+            }
+
     if rating not in ['G', 'E', 'All', 'all']:
         rating = 'G'
     elif rating == 'All' or rating == 'all':
         rating = ''
 
     video_usecase = VideoUseCase(VideoRepository(db))
-    data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort((page - 1) * limit, limit, rating, tags, sort)
-    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_sort_count(rating, tags, sort)
+    data = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_user_id_and_sort(
+        (page - 1) * limit,
+        limit,
+        rating,
+        tags,
+        sort,
+        user_id,
+    )
+    count = video_usecase.get_video_list_by_offset_and_limit_and_rating_and_tags_and_user_id_and_sort_count(
+        rating,
+        tags,
+        sort,
+        user_id,
+    )
 
     response_data = [schemas.VideoResponse(
         id=video.id,
